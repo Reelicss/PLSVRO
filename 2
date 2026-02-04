@@ -1,0 +1,46 @@
+
+-- PINK SHADER (from Empty Tools)
+
+local Lighting = game:GetService("Lighting")
+
+-- Clear old lighting
+Lighting:ClearAllChildren()
+
+-- Skybox
+local Skybox = Instance.new("Sky")
+Skybox.SkyboxBk = "http://www.roblox.com/asset/?id=271042516"
+Skybox.SkyboxDn = "http://www.roblox.com/asset/?id=271077243"
+Skybox.SkyboxFt = "http://www.roblox.com/asset/?id=271042556"
+Skybox.SkyboxLf = "http://www.roblox.com/asset/?id=271042310"
+Skybox.SkyboxRt = "http://www.roblox.com/asset/?id=271042467"
+Skybox.SkyboxUp = "http://www.roblox.com/asset/?id=271077958"
+Skybox.Parent = Lighting
+
+-- Atmosphere
+local Atmosphere = Instance.new("Atmosphere")
+Atmosphere.Parent = Lighting
+
+-- Bloom
+local Bloom = Instance.new("BloomEffect")
+Bloom.Enabled = true
+Bloom.Intensity = 1.2
+Bloom.Size = 22.5
+Bloom.Threshold = 1.1
+Bloom.Parent = Lighting
+
+-- Color Correction
+local ColorCorrection = Instance.new("ColorCorrectionEffect")
+ColorCorrection.Contrast = -0.1
+ColorCorrection.TintColor = Color3.fromRGB(245, 225, 255)
+ColorCorrection.Saturation = 0.2
+ColorCorrection.Enabled = true
+ColorCorrection.Parent = Lighting
+
+-- Optional Clouds (matches original behavior)
+if not workspace.Terrain:FindFirstChildOfClass("Clouds") then
+	local Clouds = Instance.new("Clouds")
+	Clouds.Cover = 0.67
+	Clouds.Density = 0.56
+	Clouds.Color = Color3.fromRGB(255, 149, 204)
+	Clouds.Parent = workspace.Terrain
+end

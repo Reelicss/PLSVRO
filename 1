@@ -1,0 +1,52 @@
+-- NORMAL SHADER (from Empty Tools)
+
+local Lighting = game:GetService("Lighting")
+
+-- Clear old lighting
+Lighting:ClearAllChildren()
+
+-- Skybox
+local Skybox = Instance.new("Sky")
+Skybox.SkyboxBk = "rbxassetid://566598488"
+Skybox.SkyboxDn = "rbxassetid://566598717"
+Skybox.SkyboxFt = "rbxassetid://566598536"
+Skybox.SkyboxLf = "rbxassetid://566598581"
+Skybox.SkyboxRt = "rbxassetid://566598640"
+Skybox.SkyboxUp = "rbxassetid://566598894"
+Skybox.Parent = Lighting
+
+-- Atmosphere
+local Atmosphere = Instance.new("Atmosphere")
+Atmosphere.Color = Color3.fromRGB(199, 199, 199)
+Atmosphere.Parent = Lighting
+
+-- Bloom
+local Bloom = Instance.new("BloomEffect")
+Bloom.Enabled = true
+Bloom.Intensity = 1.2
+Bloom.Size = 22.5
+Bloom.Threshold = 1.15
+Bloom.Parent = Lighting
+
+-- Sun Rays
+local SunRays = Instance.new("SunRaysEffect")
+SunRays.Spread = 0.186
+SunRays.Intensity = 0.0475
+SunRays.Parent = Lighting
+
+-- Depth of Field
+local DOF = Instance.new("DepthOfFieldEffect")
+DOF.Enabled = true
+DOF.FarIntensity = 0.205
+DOF.FocusDistance = 0.05
+DOF.InFocusRadius = 20
+DOF.NearIntensity = 0.56
+DOF.Parent = Lighting
+
+-- Clouds (optional but default in Empty Tools)
+if not workspace.Terrain:FindFirstChildOfClass("Clouds") then
+	local Clouds = Instance.new("Clouds")
+	Clouds.Cover = 0.67
+	Clouds.Density = 0.56
+	Clouds.Parent = workspace.Terrain
+end

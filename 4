@@ -1,0 +1,23 @@
+
+-- NONE SHADER (Reset to default lighting)
+
+local Lighting = game:GetService("Lighting")
+
+-- Remove all lighting effects
+Lighting:ClearAllChildren()
+
+-- Optional: reset common defaults
+Lighting.Brightness = 2
+Lighting.ClockTime = 14
+Lighting.FogEnd = 100000
+Lighting.FogStart = 0
+Lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128)
+Lighting.Ambient = Color3.fromRGB(0, 0, 0)
+Lighting.ExposureCompensation = 0
+
+-- Remove Clouds if added by shaders
+for _, v in ipairs(workspace.Terrain:GetChildren()) do
+	if v:IsA("Clouds") then
+		v:Destroy()
+	end
+end

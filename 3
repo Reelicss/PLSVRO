@@ -1,0 +1,40 @@
+
+-- SPACE SHADER (from Empty Tools)
+
+local Lighting = game:GetService("Lighting")
+
+-- Clear old lighting
+Lighting:ClearAllChildren()
+
+-- Skybox
+local Skybox = Instance.new("Sky")
+Skybox.SkyboxBk = "http://www.roblox.com/asset/?id=16262356578"
+Skybox.SkyboxDn = "http://www.roblox.com/asset/?id=16262358026"
+Skybox.SkyboxFt = "http://www.roblox.com/asset/?id=16262360469"
+Skybox.SkyboxLf = "http://www.roblox.com/asset/?id=16262362003"
+Skybox.SkyboxRt = "http://www.roblox.com/asset/?id=16262363873"
+Skybox.SkyboxUp = "http://www.roblox.com/asset/?id=16262366016"
+Skybox.Parent = Lighting
+
+-- Atmosphere
+local Atmosphere = Instance.new("Atmosphere")
+Atmosphere.Density = 0.7
+Atmosphere.Offset = 1.93
+Atmosphere.Parent = Lighting
+
+-- Bloom
+local Bloom = Instance.new("BloomEffect")
+Bloom.Enabled = true
+Bloom.Intensity = 1.05
+Bloom.Size = 20
+Bloom.Threshold = 1.25
+Bloom.Parent = Lighting
+
+-- Color Correction
+local ColorCorrection = Instance.new("ColorCorrectionEffect")
+ColorCorrection.Contrast = 0.1
+ColorCorrection.TintColor = Color3.fromRGB(229, 161, 229)
+ColorCorrection.Brightness = -0.1
+ColorCorrection.Saturation = -0.2
+ColorCorrection.Enabled = true
+ColorCorrection.Parent = Lighting

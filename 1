@@ -1,52 +1,105 @@
--- NORMAL SHADER (from Empty Tools)
+-- LocalScript in StarterPlayerScripts
 
-local Lighting = game:GetService("Lighting")
+local Workspace = game:GetService("Workspace")
 
--- Clear old lighting
-Lighting:ClearAllChildren()
+local function applyGreyscale(part)
+    if part:IsA("BasePart") or part:IsA("Terrain") then
+        local char = game.Players.LocalPlayer.Character
+        if char and part:IsDescendantOf(char) then return end
 
--- Skybox
-local Skybox = Instance.new("Sky")
-Skybox.SkyboxBk = "rbxassetid://566598488"
-Skybox.SkyboxDn = "rbxassetid://566598717"
-Skybox.SkyboxFt = "rbxassetid://566598536"
-Skybox.SkyboxLf = "rbxassetid://566598581"
-Skybox.SkyboxRt = "rbxassetid://566598640"
-Skybox.SkyboxUp = "rbxassetid://566598894"
-Skybox.Parent = Lighting
-
--- Atmosphere
-local Atmosphere = Instance.new("Atmosphere")
-Atmosphere.Color = Color3.fromRGB(199, 199, 199)
-Atmosphere.Parent = Lighting
-
--- Bloom
-local Bloom = Instance.new("BloomEffect")
-Bloom.Enabled = true
-Bloom.Intensity = 1.2
-Bloom.Size = 22.5
-Bloom.Threshold = 1.15
-Bloom.Parent = Lighting
-
--- Sun Rays
-local SunRays = Instance.new("SunRaysEffect")
-SunRays.Spread = 0.186
-SunRays.Intensity = 0.0475
-SunRays.Parent = Lighting
-
--- Depth of Field
-local DOF = Instance.new("DepthOfFieldEffect")
-DOF.Enabled = true
-DOF.FarIntensity = 0.205
-DOF.FocusDistance = 0.05
-DOF.InFocusRadius = 20
-DOF.NearIntensity = 0.56
-DOF.Parent = Lighting
-
--- Clouds (optional but default in Empty Tools)
-if not workspace.Terrain:FindFirstChildOfClass("Clouds") then
-	local Clouds = Instance.new("Clouds")
-	Clouds.Cover = 0.67
-	Clouds.Density = 0.56
-	Clouds.Parent = workspace.Terrain
+        if part:IsA("Terrain") then
+            part.WaterColor = Color3.fromRGB(60, 60, 60)
+        else
+            local c = part.Color
+            local grey = (0.299 * c.R + 0.587 * c.G + 0.114 * c.B) * 0.4
+            part.Color = Color3.new(grey, grey, grey)
+        end
+    end
 end
+
+for _, obj in ipairs(Workspace:GetDescendants()) do
+    applyGreyscale(obj)
+end
+
+Workspace.DescendantAdded:Connect(applyGreyscale)
+
+local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
+local Players = game:GetService("Players")
+local Lighting = game:GetService("Lighting")
+local Camera = Workspace.CurrentCamera
+local LocalPlayer = Players.LocalPlayer
+local Terrain = Workspace:FindFirstChildOfClass("Terrain") or Instance.new("Terrain",Workspace)
+
+getgenv().GI_SYSTEM = getgenv().GI_SYSTEM or {}
+local GI = getgenv().GI_SYSTEM
+
+for _,v in pairs(Lighting:GetChildren()) do
+	if v:IsA("Sky") then v:Destroy() end
+end
+
+Lighting.Technology = Enum.Technology.Unified
+Lighting.Ambient = Color3.fromRGB(65,61,86)
+Lighting.Brightness = 3.6
+Lighting.EnvironmentDiffuseScale = 0.1
+Lighting.EnvironmentSpecularScale = 1
+Lighting.GlobalShadows = true
+Lighting.OutdoorAmbient = Color3.fromRGB(160,160,160)
+Lighting.ShadowSoftness = 0.5
+Lighting.GeographicLatitude = 41.733
+Lighting.ExposureCompensation = 0.2
+Lighting.FogColor = Color3.fromRGB(192,192,192)
+Lighting.FogEnd = 100000
+Lighting.ClockTime = 6.5
+
+Terrain.WaterColor = Color3.fromRGB(12,81,89)
+Terrain.WaterReflectance = 1
+Terrain.WaterTransparency = 0.11
+Terrain.WaterWaveSize = 0.45
+Terrain.WaterWaveSpeed = 25
+
+local sunrays = Instance.new("SunRaysEffect", Lighting)
+sunrays.Intensity = 0.03
+sunrays.Spread = 0.128
+
+local atmosphere = Instance.new("Atmosphere", Lighting)
+atmosphere.Density = 0.3
+atmosphere.Decay = Color3.fromRGB(199,174,164)
+atmosphere.Color = Color3.fromRGB(125,113,110)
+atmosphere.Glare = 0.67
+atmosphere.Haze = 0
+
+local dof = Instance.new("DepthOfFieldEffect", Lighting)
+dof.FarIntensity = 0.7
+dof.FocusDistance = 0.05
+dof.InFocusRadius = 50
+
+local clouds = Instance.new("Clouds", Lighting)
+clouds.Cover = 0.6
+clouds.Density = 0.5
+clouds.Color = Color3.fromRGB(225,246,217)
+
+local sky = Instance.new("Sky")
+sky.SkyboxBk = "rbxassetid://1618912481"
+sky.SkyboxFt = "rbxassetid://1618913244"
+sky.SkyboxLf = "rbxassetid://1618912849"
+sky.SkyboxRt = "rbxassetid://1618911568"
+sky.SkyboxUp = "rbxassetid://1618913654"
+sky.SkyboxDn = "rbxassetid://1618913943"
+sky.Parent = Lighting
+
+spawn(function()
+	while true do
+		Terrain.WaterWaveSpeed = 25 + math.sin(tick()*0.5)*15
+		Terrain.WaterWaveSize = 0.45 + math.sin(tick()*0.3)*0.2
+		task.wait(0.1)
+	end
+end)
+
+RunService.RenderStepped:Connect(function()
+	if Workspace:FindFirstChildOfClass("Terrain") then
+		clouds.Parent = Lighting
+	else
+		clouds.Parent = nil
+	end
+end)

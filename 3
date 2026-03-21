@@ -1,40 +1,125 @@
+local Players = game:GetService('Players')
+local Lighting = game:GetService('Lighting')
+local localPlayer = Players.LocalPlayer
 
--- SPACE SHADER (from Empty Tools)
+local function toGray(c)
+    local lum = 0.299 * c.R + 0.587 * c.G + 0.114 * c.B
+    return Color3.new(lum, lum, lum)
+end
 
-local Lighting = game:GetService("Lighting")
 
--- Clear old lighting
+local function isAvatarPart(part)
+    for _, plr in ipairs(Players:GetPlayers()) do
+        local char = plr.Character
+        if char and part:IsDescendantOf(char) then
+            return true
+        end
+    end
+    return false
+end
+
+local grayCache = {}
+
+local function makeGray(part)
+    if not part:IsA('BasePart') then return end
+    if grayCache[part] then return end
+    if isAvatarPart(part) then return end
+
+    grayCache[part] = true
+    part.Color = toGray(part.Color)
+end
+
+for _, obj in ipairs(workspace:GetDescendants()) do
+    pcall(makeGray, obj)
+end
+
+workspace.DescendantAdded:Connect(function(inst)
+    task.defer(function()
+        pcall(makeGray, inst)
+    end)
+end)
+
+
+local function protectAvatar(char)
+    if not char then return end
+
+    for _, part in ipairs(char:GetDescendants()) do
+        pcall(function()
+            if part:IsA('BasePart') and grayCache[part] then
+                grayCache[part] = nil
+            end
+        end)
+    end
+
+    char.DescendantAdded:Connect(function(inst)
+        task.defer(function()
+            pcall(function()
+                if inst:IsA('BasePart') then
+                    grayCache[inst] = nil
+                end
+            end)
+        end)
+    end)
+end
+
+for _, plr in ipairs(Players:GetPlayers()) do
+    protectAvatar(plr.Character)
+    plr.CharacterAdded:Connect(protectAvatar)
+end
+
+Players.PlayerAdded:Connect(function(plr)
+    protectAvatar(plr.Character)
+    plr.CharacterAdded:Connect(protectAvatar)
+end)
+
+
 Lighting:ClearAllChildren()
 
--- Skybox
-local Skybox = Instance.new("Sky")
-Skybox.SkyboxBk = "http://www.roblox.com/asset/?id=16262356578"
-Skybox.SkyboxDn = "http://www.roblox.com/asset/?id=16262358026"
-Skybox.SkyboxFt = "http://www.roblox.com/asset/?id=16262360469"
-Skybox.SkyboxLf = "http://www.roblox.com/asset/?id=16262362003"
-Skybox.SkyboxRt = "http://www.roblox.com/asset/?id=16262363873"
-Skybox.SkyboxUp = "http://www.roblox.com/asset/?id=16262366016"
-Skybox.Parent = Lighting
+local sky = Instance.new('Sky')
+sky.SkyboxBk = 'http://www.roblox.com/asset/?id=16262356578'
+sky.SkyboxDn = 'http://www.roblox.com/asset/?id=16262358026'
+sky.SkyboxFt = 'http://www.roblox.com/asset/?id=16262360469'
+sky.SkyboxLf = 'http://www.roblox.com/asset/?id=16262362003'
+sky.SkyboxRt = 'http://www.roblox.com/asset/?id=16262363873'
+sky.SkyboxUp = 'http://www.roblox.com/asset/?id=16262366016'
+sky.StarCount = 6000
+sky.Parent = Lighting
 
--- Atmosphere
-local Atmosphere = Instance.new("Atmosphere")
-Atmosphere.Density = 0.7
-Atmosphere.Offset = 1.93
-Atmosphere.Parent = Lighting
+local atmo = Instance.new('Atmosphere')
+atmo.Density = 0.7
+atmo.Offset = 0.1
+atmo.Color = Color3.fromRGB(130, 130, 130)
+atmo.Decay = Color3.fromRGB(40, 40, 40)
+atmo.Glare = 0
+atmo.Haze = 1
+atmo.Parent = Lighting
 
--- Bloom
-local Bloom = Instance.new("BloomEffect")
-Bloom.Enabled = true
-Bloom.Intensity = 1.05
-Bloom.Size = 20
-Bloom.Threshold = 1.25
-Bloom.Parent = Lighting
+Lighting.Ambient = Color3.fromRGB(90, 90, 90)
+Lighting.OutdoorAmbient = Color3.fromRGB(90, 90, 90)
+Lighting.ColorShift_Top = Color3.fromRGB(160, 160, 160)
+Lighting.ColorShift_Bottom = Color3.fromRGB(160, 160, 160)
+Lighting.FogColor = Color3.fromRGB(20, 20, 20)
+Lighting.FogEnd = 100000
+Lighting.Brightness = 2.0
 
--- Color Correction
-local ColorCorrection = Instance.new("ColorCorrectionEffect")
-ColorCorrection.Contrast = 0.1
-ColorCorrection.TintColor = Color3.fromRGB(229, 161, 229)
-ColorCorrection.Brightness = -0.1
-ColorCorrection.Saturation = -0.2
-ColorCorrection.Enabled = true
-ColorCorrection.Parent = Lighting
+
+local bloom = Instance.new('BloomEffect')
+bloom.Enabled = true
+bloom.Intensity = 1.5
+bloom.Size = 64
+bloom.Threshold = 0.75
+bloom.Parent = Lighting
+
+local sunrays = Instance.new('SunRaysEffect')
+sunrays.Enabled = true
+sunrays.Intensity = 0.35
+sunrays.Spread = 1.0
+sunrays.Parent = Lighting
+
+local colorCorrection = Instance.new('ColorCorrectionEffect')
+colorCorrection.Saturation = 0
+colorCorrection.Brightness = 0.05
+colorCorrection.Contrast = 0.25
+colorCorrection.TintColor = Color3.fromRGB(255, 255, 255)
+colorCorrection.Enabled = true
+colorCorrection.Parent = Lighting

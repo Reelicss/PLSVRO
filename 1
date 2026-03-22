@@ -121,11 +121,20 @@ print(string.format("[Snapshot] Ready. Saved %d part colors, lighting, sky, atmo
 -- LocalScript in StarterPlayerScripts
 
 local Workspace = game:GetService("Workspace")
+local Players = game:GetService("Players")
 
-local function applyGreyscale(part)
+local function isCharacterPart(part)
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player.Character and part:IsDescendantOf(player.Character) then
+            return true
+        end
+    end
+    return false
+end
+
+local function applyDarkGrey(part)
     if part:IsA("BasePart") or part:IsA("Terrain") then
-        local char = game.Players.LocalPlayer.Character
-        if char and part:IsDescendantOf(char) then return end
+        if isCharacterPart(part) then return end
 
         if part:IsA("Terrain") then
             part.WaterColor = Color3.fromRGB(60, 60, 60)
@@ -138,10 +147,10 @@ local function applyGreyscale(part)
 end
 
 for _, obj in ipairs(Workspace:GetDescendants()) do
-    applyGreyscale(obj)
+    applyDarkGrey(obj)
 end
 
-Workspace.DescendantAdded:Connect(applyGreyscale)
+Workspace.DescendantAdded:Connect(applyDarkGrey)
 
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")

@@ -247,29 +247,33 @@ colorCorrection.Parent = Lighting
 -- LocalScript in StarterPlayerScripts
 
 local Workspace = game:GetService("Workspace")
+local Players = game:GetService("Players")
 
-local function applyGreyscale(part)
+local function isCharacterPart(part)
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player.Character and part:IsDescendantOf(player.Character) then
+            return true
+        end
+    end
+    return false
+end
+
+local function applyLightGrey(part)
     if part:IsA("BasePart") or part:IsA("Terrain") then
-        -- Skip character parts
-        local char = game.Players.LocalPlayer.Character
-        if char and part:IsDescendantOf(char) then return end
+        if isCharacterPart(part) then return end
 
         if part:IsA("Terrain") then
-            -- Terrain uses a special color shift
-            part.WaterColor = Color3.fromRGB(150, 150, 150)
+            part.WaterColor = Color3.fromRGB(200, 200, 200)
         else
-            -- Convert the part's current color to greyscale
             local c = part.Color
-            local grey = 0.299 * c.R + 0.587 * c.G + 0.114 * c.B
+            local grey = 0.6 + (0.299 * c.R + 0.587 * c.G + 0.114 * c.B) * 0.4
             part.Color = Color3.new(grey, grey, grey)
         end
     end
 end
 
--- Apply to all existing map parts
 for _, obj in ipairs(Workspace:GetDescendants()) do
-    applyGreyscale(obj)
+    applyLightGrey(obj)
 end
 
--- Also catch any parts added later
-Workspace.DescendantAdded:Connect(applyGreyscale)
+Workspace.DescendantAdded:Connect(applyLightGrey)
